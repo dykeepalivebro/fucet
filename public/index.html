@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Faucet Earner Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    body {
+      background-color: #0d1117;
+      color: #c9d1d9;
+    }
+    .background-container {
+      width: 100vw;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: #0d1117;
+      overflow: hidden;
+      z-index: -2;
+    }
+    .background-container::before,
+    .background-container::after {
+      content: '';
+      position: absolute;
+      width: 80vmax;
+      height: 80vmax;
+      border-radius: 50%;
+      filter: blur(100px);
+      z-index: -1;
+      animation: rotate 20s linear infinite;
+    }
+    .background-container::before {
+      top: -40vmax;
+      right: -40vmax;
+      background: rgba(31, 81, 255, 0.15);
+    }
+    .background-container::after {
+      bottom: -40vmax;
+      left: -40vmax;
+      background: rgba(16, 185, 129, 0.15);
+      animation-direction: reverse;
+    }
+    .spotlight {
+      position: fixed;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(45, 100, 245, 0.1) 0%, rgba(45, 100, 245, 0) 60%);
+      pointer-events: none;
+      z-index: -1;
+      transform: translate(-50%, -50%);
+      transition: width 0.3s, height 0.3s;
+    }
+    .card {
+      background: rgba(22, 27, 34, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid #30363d;
+      transition: border-color 0.3s ease;
+    }
+    .card:hover {
+      border-color: #8b949e;
+    }
+  </style>
+</head>
+<body class="font-sans min-h-screen">
+  <div class="background-container"></div>
+  <div class="spotlight"></div>
+
+  <div class="relative max-w-5xl mx-auto py-12 px-6">
+    <header class="text-center mb-12">
+      <h1 class="text-4xl md:text-5xl font-bold text-gray-100">Faucet Earner</h1>
+      <p class="text-sm text-gray-500 mt-2">Real-time Automation Dashboard</p>
+    </header>
+
+    <main class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <section class="card p-6 rounded-xl lg:col-span-2">
+        <h2 class="flex items-center text-lg font-semibold text-gray-300">
+          <!-- User Info Icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-blue-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0012 11z" clip-rule="evenodd" /></svg>
+          User Information
+        </h2>
+        <div class="mt-4 text-sm space-y-3">
+          <div class="flex justify-between"><span class="text-gray-400">Username</span><span id="username" class="font-mono text-base text-gray-200">Loading...</span></div>
+          <div class="flex justify-between"><span class="text-gray-400">Total Balance</span><span id="total_bal" class="font-mono text-base text-gray-200">0.00000000 XRP</span></div>
+          <hr class="border-gray-700 my-3">
+          <div class="flex justify-between"><span class="text-gray-500">Faucet Earnings</span><span id="faucet_earn" class="font-mono text-gray-400">0.00000000 XRP</span></div>
+          <div class="flex justify-between"><span class="text-gray-500">PTC Earnings</span><span id="ptc_earn" class="font-mono text-gray-400">0.00000000 XRP</span></div>
+          <div class="flex justify-between"><span class="text-gray-500">Investment</span><span id="invest_earn" class="font-mono text-gray-400">0.00000000 XRP</span></div>
+          <div class="flex justify-between"><span class="text-gray-500">Referral</span><span id="reff_earn" class="font-mono text-gray-400">0.00000000 XRP</span></div>
+        </div>
+      </section>
+
+      <section class="card p-6 rounded-xl">
+        <h2 class="flex items-center text-lg font-semibold text-gray-300">
+          <!-- Claiming Icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-green-400" viewBox="0 0 20 20" fill="currentColor"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 14.95a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM10 18a1 1 0 01-1-1v-1a1 1 0 112 0v1a1 1 0 01-1 1zM3.293 7.293a1 1 0 011.414 0l.707.707a1 1 0 01-1.414 1.414l-.707-.707a1 1 0 010-1.414zM10 4a6 6 0 100 12 6 6 0 000-12z" /></svg>
+          Claiming Activity
+        </h2>
+        <div class="mt-4 text-sm space-y-3">
+          <div class="flex justify-between"><span class="text-gray-400">Latest</span><span id="latest_reward" class="font-mono text-base text-gray-200">-</span></div>
+          <div class="flex justify-between"><span class="text-gray-400">Highest</span><span id="best_reward" class="font-mono text-base text-gray-200">0.00000000</span></div>
+          <div class="flex justify-between"><span class="text-gray-400">Streak</span><span id="streak" class="font-mono text-base text-gray-200">0</span></div>
+        </div>
+      </section>
+      <section class="card p-6 rounded-xl lg:col-span-3">
+  <h2 class="flex items-center text-lg font-semibold text-gray-300">
+    <!-- Chart Icon -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-purple-400" viewBox="0 0 20 20" fill="currentColor">
+      <path fill-rule="evenodd" d="M3 3a1 1 0 011-1h2a1 1 0 011 1v14a1 1 0 01-1 1H4a1 1 0 01-1-1V3zm6 4a1 1 0 011-1h2a1 1 0 011 1v10a1 1 0 01-1 1h-2a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v13a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" clip-rule="evenodd" />
+    </svg>
+    Reward History Chart
+  </h2>
+  <div class="mt-4">
+    <canvas id="rewardChart" height="100"></canvas>
+  </div>
+</section>
+
+      <section class="card p-6 rounded-xl lg:col-span-3">
+        <h2 class="flex items-center text-lg font-semibold text-gray-300">
+          <!-- Log Icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" /></svg>
+          Live Log
+        </h2>
+        <div id="log-container" class="text-xs mt-4 h-80 overflow-y-auto font-mono space-y-2 pr-2">
+          <p class="text-gray-600">Initializing logs...</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+<script>
+  // Spotlight effect
+  const spotlight = document.querySelector('.spotlight');
+  document.addEventListener('mousemove', (e) => {
+    spotlight.style.left = e.pageX + 'px';
+    spotlight.style.top = e.pageY + 'px';
+  });
+
+  // Data fetcher
+  let lastLogCount = 0;
+
+  async function fetchData() {
+    try {
+      const res = await fetch("/api/data");
+      const data = await res.json();
+
+      document.getElementById('username').textContent = data.username;
+      document.getElementById('total_bal').textContent = data.total_bal + " XRP";
+      document.getElementById('faucet_earn').textContent = data.faucet_earn + " XRP";
+      document.getElementById('ptc_earn').textContent = data.ptc_earn + " XRP";
+      document.getElementById('invest_earn').textContent = data.invest_earn + " XRP";
+      document.getElementById('reff_earn').textContent = data.reff_earn + " XRP";
+      document.getElementById('latest_reward').textContent = data.latest_reward + " XRP";
+      document.getElementById('best_reward').textContent = data.best_reward;
+      document.getElementById('streak').textContent = data.streak;
+    } catch (err) {
+      console.error("Failed to fetch data:", err);
+    }
+  }
+
+  async function fetchLogs() {
+    try {
+      const res = await fetch("/logs");
+      const logs = await res.json();
+
+      if (logs.length === lastLogCount) return;
+
+      const logContainer = document.getElementById('log-container');
+      if (lastLogCount === 0) {
+        logContainer.innerHTML = '';
+      }
+
+      const newLogs = logs.slice(lastLogCount);
+
+      newLogs.forEach(msg => {
+        const p = document.createElement('p');
+        let colorClass = 'text-gray-500';
+        if (msg.includes('💸') || msg.includes('Reward')) colorClass = 'text-green-400';
+        else if (msg.includes('⏳') || msg.includes('Waiting')) colorClass = 'text-yellow-500';
+        else if (msg.includes('🔍') || msg.includes('Getting')) colorClass = 'text-blue-400';
+        else if (msg.includes('Error') || msg.includes('denied')) colorClass = 'text-red-500';
+
+        p.className = `whitespace-pre-wrap ${colorClass}`;
+        p.textContent = `> ${msg}`;
+        logContainer.prepend(p);
+      });
+
+      lastLogCount = logs.length;
+      logContainer.scrollTop = 0; // Auto-scroll ke atas
+
+    } catch (err) {
+      console.error("Failed to fetch logs:", err);
+    }
+  }
+
+  setInterval(fetchData, 3000);
+  setInterval(fetchLogs, 2000);
+  fetchData();
+  fetchLogs();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  let rewardChart = null;
+  const rewardData = [];
+  const labels = [];
+
+  function updateRewardChart(newReward) {
+    const reward = parseFloat(newReward);
+    const now = new Date().toLocaleTimeString();
+
+    if (rewardData.length >= 10) {
+      rewardData.shift();
+      labels.shift();
+    }
+
+    rewardData.push(reward);
+    labels.push(now);
+
+    if (!rewardChart) {
+      const ctx = document.getElementById('rewardChart').getContext('2d');
+      rewardChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'XRP Claimed',
+            data: rewardData,
+            borderColor: 'rgba(16, 185, 129, 1)',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            tension: 0.4,
+            fill: true,
+            pointRadius: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            x: { display: true },
+            y: { display: true }
+          },
+          plugins: { legend: { display: false } }
+        }
+      });
+    } else {
+      rewardChart.data.labels = labels;
+      rewardChart.data.datasets[0].data = rewardData;
+      rewardChart.update();
+    }
+  }
+
+  async function fetchChartData() {
+    try {
+      const res = await fetch("/api/data");
+      const data = await res.json();
+      updateRewardChart(data.latest_reward);
+    } catch (err) {
+      console.error("Chart update error:", err);
+    }
+  }
+
+  setInterval(fetchChartData, 5000);
+  fetchChartData();
+</script>
+</body>
+</html>

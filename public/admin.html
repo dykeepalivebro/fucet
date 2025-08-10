@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Control Panel</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body { background-color: #0d1117; color: #c9d1d9; }
+    .card { background: rgba(22, 27, 34, 0.8); backdrop-filter: blur(10px); border: 1px solid #30363d; }
+    .btn { transition: background-color 0.2s, border-color 0.2s; }
+    .btn-green { background-color: #238636; border: 1px solid #2ea043; }
+    .btn-green:hover { background-color: #2ea043; }
+    .btn-red { background-color: #da3633; border: 1px solid #f85149; }
+    .btn-red:hover { background-color: #f85149; }
+    .status-dot { width: 12px; height: 12px; border-radius: 50%; transition: background-color 0.5s; }
+    .status-running { background-color: #238636; box-shadow: 0 0 8px #238636; }
+    .status-stopped { background-color: #da3633; box-shadow: 0 0 8px #da3633; }
+  </style>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</head>
+<body class="min-h-screen flex items-center justify-center font-sans p-4">
+
+  <div id="login-section" class="w-full max-w-sm">
+    <div class="card p-8 rounded-lg shadow-lg">
+      <h1 class="text-2xl font-bold text-center text-gray-100 mb-6">Admin Login</h1>
+      <form id="login-form">
+        <div class="mb-4">
+          <label for="username" class="block text-gray-400 text-sm font-bold mb-2">Username</label>
+          <input type="text" id="username" name="username" class="w-full bg-gray-900 border border-gray-700 rounded py-2 px-3 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <div class="mb-6">
+          <label for="password" class="block text-gray-400 text-sm font-bold mb-2">Password</label>
+          <input type="password" id="password" name="password" class="w-full bg-gray-900 border border-gray-700 rounded py-2 px-3 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <div class="g-recaptcha mb-4 flex justify-center" data-sitekey="6LcDYqArAAAAAALaavtHS6-gG6gi1WO1lOLe9U48"></div>
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline btn">Login</button>
+        <p id="error-message" class="text-red-500 text-xs text-center mt-4"></p>
+      </form>
+    </div>
+  </div>
+
+  <div id="control-panel" class="w-full max-w-sm hidden">
+    <div class="card p-8 rounded-lg shadow-lg text-center">
+        <h1 class="text-2xl font-bold text-gray-100 mb-4">Bot Control Panel</h1>
+        <div class="flex items-center justify-center gap-3 mb-2">
+            <div id="status-dot" class="status-dot status-stopped"></div>
+            <span id="status-text" class="text-lg font-semibold text-gray-300">Stopped</span>
+        </div>
+        <p class="text-gray-400 text-sm mb-6">Activity: <span id="activity-text">Idle</span></p>
+
+        <div class="flex gap-4">
+            <button id="start-btn" class="w-full text-white font-bold py-3 px-4 rounded btn btn-green">Start Bot</button>
+            <button id="stop-btn" class="w-full text-white font-bold py-3 px-4 rounded btn btn-red">Stop Bot</button>
+        </div>
+        <a href="/admin/logout" class="text-sm text-blue-400 hover:underline mt-6 inline-block">Logout</a>
+    </div>
+  </div>
+
+<script>
+    const loginSection = document.getElementById('login-section');
+    const controlPanel = document.getElementById('control-panel');
+    const loginForm = document.getElementById('login-form');
+    const errorMessage = document.getElementById('error-message');
+
+    const startBtn = document.getElementById('start-btn');
+    const stopBtn = document.getElementById('stop-btn');
+    const statusDot = document.getElementById('status-dot');
+    const statusText = document.getElementById('status-text');
+    const activityText = document.getElementById('activity-text');
+    
+    let statusInterval;
+
+    async function checkInitialStatus() {
+        try {
+            const res = await fetch('/api/control/status');
+            if (res.ok) {
+                loginSection.classList.add('hidden');
+                controlPanel.classList.remove('hidden');
+                startStatusUpdates();
+            }
+        } catch (e) { /* Not logged in */ }
+    }
+
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        errorMessage.textContent = '';
+        const recaptchaToken = grecaptcha.getResponse();
+        if (!recaptchaToken) {
+            errorMessage.textContent = 'Please complete the reCAPTCHA.';
+            return;
+        }
+        const formData = new FormData(loginForm);
+        formData.append('g-recaptcha-response', recaptchaToken);
+        try {
+            const res = await fetch('/admin/login', { method: 'POST', body: formData });
+            const data = await res.json();
+            if (data.success) {
+                loginSection.classList.add('hidden');
+                controlPanel.classList.remove('hidden');
+                startStatusUpdates();
+            } else {
+                errorMessage.textContent = data.message || 'Login failed.';
+                grecaptcha.reset();
+            }
+        } catch (err) {
+            errorMessage.textContent = 'An error occurred.';
+            grecaptcha.reset();
+        }
+    });
+
+    const sendControlRequest = async (url) => {
+        await fetch(url, { method: 'POST' });
+        updateStatus();
+    };
+
+    startBtn.addEventListener('click', () => sendControlRequest('/api/control/start'));
+    stopBtn.addEventListener('click', () => sendControlRequest('/api/control/stop'));
+
+    async function updateStatus() {
+        try {
+            const res = await fetch('/api/control/status');
+            const data = await res.json();
+            
+            activityText.textContent = data.activity || 'Idle';
+
+            if (data.status === 'running') {
+                statusText.textContent = 'Running';
+                statusDot.classList.remove('status-stopped');
+                statusDot.classList.add('status-running');
+            } else {
+                statusText.textContent = 'Stopped';
+                statusDot.classList.remove('status-running');
+                statusDot.classList.add('status-stopped');
+            }
+        } catch (err) {
+            console.error("Failed to fetch status");
+            clearInterval(statusInterval);
+        }
+    }
+
+    function startStatusUpdates() {
+        updateStatus();
+        setInterval(updateStatus, 3000);
+    }
+
+    checkInitialStatus();
+</script>
+</body>
+</html>
